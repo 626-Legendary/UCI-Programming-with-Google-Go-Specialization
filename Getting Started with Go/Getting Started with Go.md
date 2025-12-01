@@ -1,4 +1,3 @@
-````markdown
 # 📘 Why Should I Learn Go?  
 # 为什么要学习 Go 语言？
 
@@ -69,7 +68,7 @@ type Point struct {
 func (p Point) DistToOrigin() float64 {
     // ...
 }
-````
+```
 
 ### Benefits 好处
 
