@@ -7,87 +7,110 @@ import (
 	"strings"
 )
 
-type Animal interface{
+// Animal 接口：Eat / Move / Speak 都不带参数、不返回值
+type Animal interface {
 	Eat()
 	Move()
 	Speak()
 }
 
-type Cow struct{
-	//{food : "grass", locomotion : "walk", spoken : "moo"}
-}
-func (a *Cow) Eat(){
+type Cow struct{}
+type Bird struct{}
+type Snake struct{}
+
+func (c Cow) Eat() {
 	fmt.Println("grass")
 }
-func (a *Cow) Move(){
+func (c Cow) Move() {
 	fmt.Println("walk")
 }
-func (a *Cow) Speak(){
+func (c Cow) Speak() {
 	fmt.Println("moo")
 }
 
-type Bird struct{
-	//{food : "worms", locomotion : "fly", spoken : "poop"}
-}
-func (a *Bird) Eat(){
+func (b Bird) Eat() {
 	fmt.Println("worms")
 }
-func (a *Bird) Move(){
+func (b Bird) Move() {
 	fmt.Println("fly")
 }
-func (a *Bird) Speak(){
-	fmt.Println("poop")
+func (b Bird) Speak() {
+	fmt.Println("peep")
 }
 
-type Snake struct{
-	//{food : "mice", locomotion : "slither", spoken : "hsss"}
-}
-func (a *Snake) Eat(){
+func (s Snake) Eat() {
 	fmt.Println("mice")
 }
-func (a *Snake) Move(){
+func (s Snake) Move() {
 	fmt.Println("slither")
 }
-func (a *Snake) Speak(){
+func (s Snake) Speak() {
 	fmt.Println("hsss")
 }
 
-func main(){
+func main() {
 	reader := bufio.NewReader(os.Stdin)
 
+	// name -> Animal
 	animals := make(map[string]Animal)
 
-	for{
+	for {
 		fmt.Print("> ")
-		input, _ := reader.ReadString('\n')
-		s := strings.Split(strings.TrimSpace(input), " ")
 
-		switch s[0]{
-			case "newanimal":
-				switch s[2]{
-					case "cow":
-						animals[s[1]] = new(Cow)
-					case "bird":
-						animals[s[1]] = new(Bird)
-					case "snake":
-						animals[s[1]] = new(Snake)
-				}
-				fmt.Println("Created it!")
-			case "query":
-				obj, ok := animals[s[1]]
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			return
+		}
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
 
-				if ok{
-					switch s[2]{
-						case "eat":
-							obj.Eat()
-						case "move":
-							obj.Move()
-						case "speak":
-							obj.Speak()
-					}
-				}else{
-					fmt.Println("Not found!")
-				}
+		parts := strings.Split(line, " ")
+		if len(parts) != 3 {
+			fmt.Println("Please enter: newanimal/query <name> <type/info>")
+			continue
+		}
+
+		cmd := parts[0]
+		name := parts[1]
+		arg := parts[2]
+
+		switch cmd {
+		case "newanimal":
+			switch arg {
+			case "cow":
+				animals[name] = Cow{}
+			case "bird":
+				animals[name] = Bird{}
+			case "snake":
+				animals[name] = Snake{}
+			default:
+				fmt.Println("Unknown animal type")
+				continue
+			}
+			fmt.Println("Created it!")
+
+		case "query":
+			a, ok := animals[name]
+			if !ok {
+				fmt.Println("Animal not found")
+				continue
+			}
+			switch arg {
+			case "eat":
+				a.Eat()
+			case "move":
+				a.Move()
+				// speak
+			case "speak":
+				a.Speak()
+			default:
+				fmt.Println("Unknown info type")
+			}
+
+		default:
+			fmt.Println("Unknown command")
 		}
 	}
 }
